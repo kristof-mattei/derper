@@ -61,47 +61,18 @@ jobs:
           has_container="${{ vars.HAS_CONTAINER }}"
           echo "has_container=${has_container:-false}" >> "${GITHUB_OUTPUT}"
 
-  changes:
-    name: Detect changes
-    runs-on: ubuntu-slim
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
-    permissions:
-      contents: read
-      pull-requests: read
-    outputs:
-      docker: ${{ steps.filter.outputs.docker }}
-      rust: ${{ steps.filter.outputs.rust }}
-    steps:
-      - &checkout
-        name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          show-progress: false
-
-      - name: Check if we actually made changes
-        uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
-        id: filter
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          filters: .github/file-filters.yml
-
   calculate-version:
     name: Calculate version
     runs-on: ubuntu-slim
     permissions:
       contents: read
     needs:
-      - changes
       - repo-has-container
     outputs:
       version: ${{ steps.version.outputs.version }}
     if: |
       github.event_name == 'pull_request' &&
-      fromJSON(needs.repo-has-container.outputs.has_container) == true &&
-      (
-        fromJSON(needs.changes.outputs.docker) == true ||
-        fromJSON(needs.changes.outputs.rust) == true
-      )
+      fromJSON(needs.repo-has-container.outputs.has_container) == true
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -209,14 +180,9 @@ jobs:
       - calculate-version
       - architectures
       - docker-prepare-variables
-      - changes
       - repo-has-container
     if: |
-      fromJSON(needs.repo-has-container.outputs.has_container) == true &&
-      (
-        fromJSON(needs.changes.outputs.docker) == true ||
-        fromJSON(needs.changes.outputs.rust) == true
-      )
+      fromJSON(needs.repo-has-container.outputs.has_container) == true
     steps:
       - *checkout
 
@@ -530,7 +496,6 @@ jobs:
     # combination of upstream skip and success: success
     runs-on: ubuntu-slim
     needs:
-      - changes
       - calculate-version
       - docker-prepare-variables
       - docker-build
