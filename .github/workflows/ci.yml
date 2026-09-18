@@ -299,7 +299,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       registry:
-        image: registry:3@sha256:b0f3668eb14daa3089aee66b4afd65bf2c2065439d6b5b6357bd3ba711fcf5bd
+        image: registry:3@sha256:fd374bae807c225661adfe2c0c1f9970a0b8fab1761fd7dfb91e0fd9a8748f9b
         ports:
           - 5000:5000
     outputs:
