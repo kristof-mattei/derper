@@ -6,7 +6,7 @@ ENV CGO_ENABLED=0 GOOS=linux
 
 RUN go install tailscale.com/cmd/derper@latest
 
-FROM alpine:3.20@sha256:a4f4213abb84c497377b8544c81b3564f313746700372ec4fe84653e4fb03805
+FROM alpine:3.24@sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S derper \
